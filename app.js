@@ -50,25 +50,23 @@ app.use("/kashikaTravel", carDetailsRouter);
 
 // ===== Session (JWT) check =====
 app.get("/kashikaTravel/session-user", (req, res) => {
-  // Read token from the cookie sent by the browser
   const token = req.cookies.token;
-  console.log("Token received from cookie:", token);
-
   if (!token) {
     return res.json({ loggedIn: false, user: { userType: "guest" } });
   }
 
   try {
-    // Verify the token
     const decoded = jwt.verify(token, process.env.JWT_SECRET);
-    console.log("Decoded Token:", decoded);
-    // Send back user data from the token
-    return res.json({ loggedIn: true, user: decoded });
+    return res.json({
+      loggedIn: decoded.isLogged,
+      user: decoded.user, // full user data
+    });
   } catch (err) {
     console.log("JWT verify error:", err.message);
     return res.json({ loggedIn: false, user: { userType: "guest" } });
   }
 });
+
 
 // ===== Start server =====
 mongoose.connect(mongoUrl)

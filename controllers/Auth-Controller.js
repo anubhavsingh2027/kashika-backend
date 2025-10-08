@@ -23,42 +23,48 @@ exports.postSignUp = async (req, res) => {
 };
 
 // ===== LOGIN =====
-
 exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // Fetch the user including password
+    // 1️⃣ Find user
     const user = await User.findOne({ email: email.toLowerCase() }).lean();
-    if (!user) return res.status(422).json({ status: false, message: "User not found" });
+    if (!user)
+      return res.status(422).json({ status: false, message: "User not found" });
 
+    // 2️⃣ Check password
     const isMatch = await bcrypt.compare(password, user.password);
-    if (!isMatch) return res.status(422).json({ status: false, message: "Incorrect password" });
+    if (!isMatch)
+      return res.status(422).json({ status: false, message: "Incorrect password" });
 
-    // Create JWT (optional: minimal info for auth)
-    const token = jwt.sign(
-      { id: user._id, user:user },
-      process.env.JWT_SECRET,
-      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
-    );
+    // 3️⃣ Remove password before encoding
+    const { password: _, ...safeUser } = user;
 
-    // Send JWT cookie
+    // 4️⃣ Create full JWT payload
+    const tokenPayload = {
+      isLogged: true,
+      user: safeUser, // all data here
+    };
+
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+    });
+
+    // 5️⃣ Send cookie
     res.cookie("token", token, {
       httpOnly: true,
-      secure: true,          // true for HTTPS
+      secure: true, // true on HTTPS
       sameSite: "none",
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-
-
+    // 6️⃣ Send response
     res.status(200).json({
       status: true,
       message: "Login successful",
       isLoggedIn: true,
-      user: user
+      user: safeUser,
     });
-
   } catch (err) {
     console.error("Login error:", err);
     res.status(500).json({ status: false, message: `Failed To Login: ${err.message}` });
