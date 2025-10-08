@@ -37,7 +37,7 @@ exports.postLogin = async (req, res) => {
 
     // Create JWT (optional: minimal info for auth)
     const token = jwt.sign(
-      { id: user._id, email: user.email },
+      { id: user._id, user:user },
       process.env.JWT_SECRET,
       { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
     );
@@ -55,7 +55,6 @@ exports.postLogin = async (req, res) => {
     res.status(200).json({
       status: true,
       message: "Login successful",
-      token,
       isLoggedIn: true,
       user: user
     });
