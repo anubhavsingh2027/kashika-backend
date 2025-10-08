@@ -23,35 +23,45 @@ exports.postSignUp = async (req, res) => {
 };
 
 // ===== LOGIN =====
+
 exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-    const user = await User.findOne({ email: email.toLowerCase() }).lean();
-
+    const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) return res.status(422).json({ status: false, message: "User not found" });
+
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(422).json({ status: false, message: "Incorrect password" });
 
-    const token = jwt.sign({ id: user._id, email: user.email }, process.env.JWT_SECRET, {
-      expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+    // Create JWT (optional: minimal info)
+    const token = jwt.sign(
+      { id: user._id, email: user.email },
+      process.env.JWT_SECRET,
+      { expiresIn: process.env.JWT_EXPIRES_IN || "1d" }
+    );
+
+    // Send JWT cookie
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,          // true for HTTPS
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24,
     });
 
-    // send JWT cookie
- res.cookie("token", token, {
-  httpOnly: true,
-  secure: true,          // MUST be true for HTTPS
-  sameSite: "none",      // allows cross-site requests from your backend
-  maxAge: 1000 * 60 * 60 * 24,
-});
-
-
-    res.status(200).json({ status: true, message: "Login successful", token });
-  } catch (error) {
-    console.error("Login error:", error);
+    // Send full user data except password
+    const { password: pwd, ...userData } = user.toObject();
+    res.status(200).json({
+      status: true,
+      message: "Login successful",
+      token,
+      isLoggedIn: true,
+      user: userData
+    });
+  } catch (err) {
+    console.error("Login error:", err);
     res.status(500).json({ status: false, message: "Server error during login" });
   }
 };
-
 // ===== LOGOUT =====
 exports.postLogout = (req, res) => {
   res.clearCookie("token", { domain: "127.0.0.1", sameSite: "none" });
