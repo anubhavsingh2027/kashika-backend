@@ -27,13 +27,15 @@ exports.postSignUp = async (req, res) => {
 exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
-     const user = await User.findOne({ email: email.toLowerCase() }).lean();
+
+    // Fetch the user including password
+    const user = await User.findOne({ email: email.toLowerCase() }); // no .lean()
     if (!user) return res.status(422).json({ status: false, message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch) return res.status(422).json({ status: false, message: "Incorrect password" });
 
-    // Create JWT (optional: minimal info)
+    // Create JWT (optional: minimal info for auth)
     const token = jwt.sign(
       { id: user._id, email: user.email },
       process.env.JWT_SECRET,
@@ -48,8 +50,9 @@ exports.postLogin = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    // Send full user data except password
-    const { password: pwd, ...userData } = user;
+    // Convert Mongoose document to plain object
+    const userData = user.toObject(); // includes password
+
     res.status(200).json({
       status: true,
       message: "Login successful",
@@ -57,11 +60,13 @@ exports.postLogin = async (req, res) => {
       isLoggedIn: true,
       user: userData
     });
+
   } catch (err) {
     console.error("Login error:", err);
-    res.status(500).json({ status: false, message: `${err}` });
+    res.status(500).json({ status: false, message: `Failed To Login: ${err.message}` });
   }
 };
+
 // ===== LOGOUT =====
 exports.postLogout = (req, res) => {
   res.clearCookie("token", { domain: "127.0.0.1", sameSite: "none" });
