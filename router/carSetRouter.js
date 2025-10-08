@@ -8,7 +8,7 @@ carAddRouter.get("/addCar",(req,res,next)=>{
   return res.json("hey ");
 })
 carAddRouter.post("/addCar", carAddController.createCar);
-carAddRouter.delete("/delete/:id", carAddController.deleteCar);
+carAddRouter.delete("/carDelete/:id", carAddController.deleteCar);
 
 
 

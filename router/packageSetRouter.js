@@ -7,7 +7,7 @@ const packageaddController = require("../controllers/adminController");
 
 
 packageAddRouter.post("/createPackage", packageaddController.createPackage);
-packageAddRouter.delete("/packagedelete/:id", packageaddController.deletepackage);
+packageAddRouter.delete("/packageDelete/:id", packageaddController.deletepackage);
 
 
 module.exports = packageAddRouter;
