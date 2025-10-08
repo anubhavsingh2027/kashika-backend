@@ -29,7 +29,7 @@ exports.postLogin = async (req, res) => {
     const { email, password } = req.body;
 
     // Fetch the user including password
-    const user = await User.findOne({ email: email.toLowerCase() }); // no .lean()
+    const user = await User.findOne({ email: email.toLowerCase() }).lean();
     if (!user) return res.status(422).json({ status: false, message: "User not found" });
 
     const isMatch = await bcrypt.compare(password, user.password);
@@ -50,15 +50,14 @@ exports.postLogin = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    // Convert Mongoose document to plain object
-    const userData = user.toObject(); // includes password
+
 
     res.status(200).json({
       status: true,
       message: "Login successful",
       token,
       isLoggedIn: true,
-      user: userData
+      user: user
     });
 
   } catch (err) {
