@@ -6,18 +6,55 @@ const jwt = require("jsonwebtoken");
 exports.postSignUp = async (req, res) => {
   const { userName, email, phone, location, password } = req.body;
   try {
+    // 1️⃣ Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({ status: false, message: "User already exists" });
     }
 
+    // 2️⃣ Hash password and create new user
     const hashedPassword = await bcrypt.hash(password, 12);
-    const user = new User({ userName, email: email.toLowerCase(), phone, location, password: hashedPassword });
-    await user.save();
+    const newUser = new User({
+      userName,
+      email: email.toLowerCase(),
+      phone,
+      location,
+      password: hashedPassword,
+    });
+    await newUser.save();
 
-    res.status(200).json({ status: true, message: "User registered successfully!" });
+    // 3️⃣ Prepare safe user data (exclude password)
+    const userObj = newUser.toObject();
+    const { password: _, ...safeUser } = userObj;
+
+    // 4️⃣ Create token payload
+    const tokenPayload = {
+      isLogged: true,
+      user: safeUser,
+    };
+
+    // 5️⃣ Sign JWT
+    const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
+      expiresIn: process.env.JWT_EXPIRES_IN || "1d",
+    });
+
+    // 6️⃣ Store token in cookie (secure for cross-origin)
+    res.cookie("token", token, {
+      httpOnly: true,
+      secure: true,
+      sameSite: "none",
+      maxAge: 1000 * 60 * 60 * 24,
+    });
+
+    // 7️⃣ Send same type of response as postLogin
+    res.status(200).json({
+      status: true,
+      message: "User registered successfully!",
+      isLoggedIn: true,
+      user: safeUser,
+    });
   } catch (err) {
-    console.log("Signup error:", err);
+    console.error("Signup error:", err);
     res.status(500).json({ status: false, message: "Server error during signup" });
   }
 };
