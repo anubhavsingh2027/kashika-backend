@@ -69,34 +69,37 @@ exports.postLogin = async (req, res) => {
     res.status(500).json({ status: false, message: `Failed To Login: ${err.message}` });
   }
 };
-
 //=== Forget Password ===
-exports.postForget= async(req,res,next)=>{
-    try {
+exports.postForget = async (req, res, next) => {
+  try {
     const { email, password } = req.body;
 
-
-    const user = await User.findOne({ email: email.toLowerCase() }).lean();
-      if (!user)
+    // 1️⃣ Find user (remove .lean())
+    const user = await User.findOne({ email: email.toLowerCase() });
+    if (!user)
       return res.status(422).json({ status: false, message: "User not found" });
-        const isMatch = await bcrypt.compare(password, user.password);
+
+    // 2️⃣ Check if password is same
+    const isMatch = await bcrypt.compare(password, user.password);
     if (isMatch)
-      return res.status(422).json({ status: false, message: "Same password is not allowed" });
+      return res.status(422).json({ status: false, message: "Already Same Password" });
 
-    const newPassword =await bcrypt.hash(password, 12);
+    // 3️⃣ Hash and update
+    const newPassword = await bcrypt.hash(password, 12);
     user.password = newPassword;
-    await user.save();
 
-     res.status(200).json({
+    await user.save(); // ✅ Works now because user is a Mongoose document
+
+    res.status(200).json({
       status: true,
       message: "Password Change successful",
     });
 
-    } catch (err) {
-    res.status(500).json({ status: false, message: `Failed To Change Password `});
+  } catch (err) {
+    console.error("Error changing password:", err);
+    res.status(500).json({ status: false, message: "Failed To Change Password" });
   }
-
-}
+};
 
 
 // ===== LOGOUT =====
