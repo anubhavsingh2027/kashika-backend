@@ -87,9 +87,13 @@ exports.postForget = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    user.password = hashedPassword;
-    await user.save(); // keeps Mongoose middleware intact
-
+     const result = await User.updateOne(
+      { _id: user._id },
+      { $set: { password: hashedPassword } }
+    );
+     if (result.modifiedCount === 0) {
+      return res.status(500).json({ status: false, message: "Failed To Change via count Password" });
+    }
     res.status(200).json({ status: true, message: "Password Change successful" });
   } catch (err) {
     res.status(500).json({ status: false, message: "Failed To Change Password" });
