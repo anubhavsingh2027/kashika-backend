@@ -92,7 +92,7 @@ exports.postForget = async (req, res) => {
       { $set: { password: hashedPassword } }
     );
      if (result.modifiedCount === 0) {
-      return res.status(500).json({ status: false, message: "Failed To Change via count Password" });
+      return res.status(500).json({ status: false, message: "Failed To Change Password" });
     }
     res.status(200).json({ status: true, message: "Password Change successful" });
   } catch (err) {
@@ -118,5 +118,25 @@ exports.verifyJWT = function (req, res, next) {
     next();
   } catch (err) {
     return res.status(401).json({ status: false, message: "Invalid token" });
+  }
+};
+
+exports.updateUserType = async (req, res) => {
+  try {
+    const { id, changeType } = req.body;
+
+    const result = await User.updateOne(
+      { _id: id },
+      { $set: { userType: changeType } }
+    );
+
+    if (result.modifiedCount === 0) {
+      return res.status(400).json({ status: false, message: "User type not changed" });
+    }
+
+    res.status(200).json({ status: true, message: "User type changed successfully!" });
+
+  } catch (err) {
+    res.status(500).json({ status: false, message: "Server error while changing user type" });
   }
 };
