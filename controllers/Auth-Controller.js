@@ -75,7 +75,7 @@ exports.postForget = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    const user = await User.findOne({ email: email.toLowerCase() });
+    const user = await User.findOne({ email: email.toLowerCase() }).lean();
     if (!user) {
       return res.status(422).json({ status: false, message: "User not found" });
     }
@@ -92,7 +92,6 @@ exports.postForget = async (req, res) => {
 
     res.status(200).json({ status: true, message: "Password Change successful" });
   } catch (err) {
-    console.error("Forget password error:", err);
     res.status(500).json({ status: false, message: "Failed To Change Password" });
   }
 };
