@@ -31,14 +31,11 @@ app.use(cookieParser());
 
 // ===== CORS setup (CRITICAL) =====
 app.use(cors({
-  origin: ["https://anubhavsingh2027.github.io"], // frontend origin
+  origin: ["https://anubhavsingh2027.github.io"], 
   credentials: true,
 }));
 
 
-// ===== REMOVED SESSION STORE =====
-// Your JWT implementation is stateless and doesn't require a server-side session store
-// like express-session. Removing it simplifies the code and avoids potential conflicts.
 
 // ===== ROUTES =====
 app.use("/kashikaTravel", fetchRouter);

@@ -103,9 +103,14 @@ exports.postForget = async (req, res) => {
 
 // ===== LOGOUT =====
 exports.postLogout = (req, res) => {
-  res.clearCookie("token", { domain: "127.0.0.1", sameSite: "none" });
+  res.clearCookie("token", {
+    httpOnly: true,
+    secure: true,
+    sameSite: "none",
+  });
   res.status(200).json({ status: true, message: "Logged out successfully" });
 };
+
 
 exports.verifyJWT = function (req, res, next) {
   const token = req.cookies.token || req.headers['authorization'];
