@@ -66,10 +66,38 @@ exports.postLogin = async (req, res) => {
       user: safeUser,
     });
   } catch (err) {
-    console.error("Login error:", err);
     res.status(500).json({ status: false, message: `Failed To Login: ${err.message}` });
   }
 };
+
+//=== Forget Password ===
+exports.postForget= async(req,res,next)=>{
+    try {
+    const { email, password } = req.body;
+
+
+    const user = await User.findOne({ email: email.toLowerCase() }).lean();
+      if (!user)
+      return res.status(422).json({ status: false, message: "User not found" });
+        const isMatch = await bcrypt.compare(password, user.password);
+    if (isMatch)
+      return res.status(422).json({ status: false, message: "Same password is not allowed" });
+
+    const newPassword =await bcrypt.hash(password, 12);
+    user.password = newPassword;
+    await user.save();
+
+     res.status(200).json({
+      status: true,
+      message: "Password Change successful",
+    });
+
+    } catch (err) {
+    res.status(500).json({ status: false, message: `Failed To Change Password `});
+  }
+
+}
+
 
 // ===== LOGOUT =====
 exports.postLogout = (req, res) => {

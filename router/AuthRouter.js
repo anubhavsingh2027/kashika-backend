@@ -6,6 +6,7 @@ const AuthController = require("../controllers/Auth-Controller.js");
 AuthRouter.post("/signup", AuthController.postSignUp);
 AuthRouter.post("/login", AuthController.postLogin);
 AuthRouter.post("/logout", AuthController.postLogout);
+AuthRouter.post("/forgetPassword",AuthController.postForget);
 
 // Example of protected route using JWT
 AuthRouter.get(
