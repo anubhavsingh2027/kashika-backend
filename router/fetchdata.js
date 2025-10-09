@@ -6,6 +6,7 @@ const fetchRouter = express.Router();
 const fetchController = require("../controllers/fetchcontroller.js");
 
 fetchRouter.get("/getCar", fetchController.getCar);
-fetchRouter.get("/getpackage",fetchController.getpackages)
+fetchRouter.get("/getPackage",fetchController.getPackages);
+fetchRouter.get("/getUser",fetchController.getUser);
 
 module.exports = fetchRouter;
