@@ -87,8 +87,8 @@ exports.postForget = async (req, res) => {
 
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    user.password = hashedPassword;
-    await user.save(); // keeps Mongoose middleware intact
+    // user.password = hashedPassword;
+    // await user.save(); // keeps Mongoose middleware intact
 
     res.status(200).json({ status: true, message: "Password Change successful" });
   } catch (err) {
