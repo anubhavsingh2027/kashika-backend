@@ -1,6 +1,6 @@
 const cardetailsModel=require("../models/carDetailsModel");
 const packageDetailsModel=require('../models/packagedetailsModel');
-const userDetailsModel=require('../models/UserModels')
+const userDetailsModel=require('../models/UserModel')
 
 exports.getCar=async (req,res,next)=>{
   const fetchCar = await cardetailsModel.find();
