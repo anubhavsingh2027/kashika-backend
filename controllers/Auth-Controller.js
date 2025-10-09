@@ -69,41 +69,30 @@ exports.postLogin = async (req, res) => {
     res.status(500).json({ status: false, message: `Failed To Login: ${err.message}` });
   }
 };
-const bcrypt = require('bcryptjs'); // or 'bcrypt'
-const User = require('../models/User'); // adjust path
 
+// ===== FORGET PASSWORD =====
 exports.postForget = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1️⃣ Find user as Mongoose document (no .lean())
     const user = await User.findOne({ email: email.toLowerCase() });
     if (!user) {
       return res.status(422).json({ status: false, message: "User not found" });
     }
 
-    // 2️⃣ Check if new password is same as old
     const isSamePassword = await bcrypt.compare(password, user.password);
     if (isSamePassword) {
       return res.status(422).json({ status: false, message: "Already Same Password" });
     }
 
-    // 3️⃣ Hash the new password
     const hashedPassword = await bcrypt.hash(password, 12);
 
-    // 4️⃣ Update password in database
-    const updated = await User.updateOne(
-      { _id: user._id },
-      { $set: { password: hashedPassword } }
-    );
-
-    if (updated.modifiedCount === 0) {
-      return res.status(500).json({ status: false, message: "Failed To Change while count Password" });
-    }
+    user.password = hashedPassword;
+    await user.save(); // keeps Mongoose middleware intact
 
     res.status(200).json({ status: true, message: "Password Change successful" });
-
   } catch (err) {
+    console.error("Forget password error:", err);
     res.status(500).json({ status: false, message: "Failed To Change Password" });
   }
 };
