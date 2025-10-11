@@ -49,7 +49,7 @@ exports.postSignUp = async (req, res) => {
     // 7️⃣ Send same type of response as postLogin
     res.status(200).json({
       status: true,
-      message: `Welcome to kashika Travel Mrs/Mr${userName}`,
+      message: `Welcome to kashika Travel Mrs/Mr  ${userName}`,
       isLoggedIn: true,
       user: safeUser,
     });
@@ -98,7 +98,7 @@ exports.postLogin = async (req, res) => {
     // 6️⃣ Send response
     res.status(200).json({
       status: true,
-      message: `Welcome again Mrs/Mr${user.userName}`,
+      message: `Welcome again Mrs/Mr  ${user.userName}`,
       isLoggedIn: true,
       user: safeUser,
     });
