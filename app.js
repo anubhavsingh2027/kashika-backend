@@ -11,11 +11,9 @@ const mongoose = require('mongoose');
 
 // ===== Local modules =====
 const fetchRouter = require('./router/fetchdata');
-const packageRouter = require('./router/packageRouter');
-const carDetailsRouter = require('./router/carRouter');
+const packageRouter = require('./router/bookRouter');
 const authRouter = require('./router/AuthRouter');
-const packageSetRouter = require('./router/packageSetRouter');
-const carSetRouter = require('./router/carSetRouter');
+const carSetRouter = require('./router/adminResourcesSet');
 
 
 // ===== App & DB setup =====
@@ -76,11 +74,9 @@ app.use("/kashikaTravel/admin",async (req, res, next) => {
 
 // ===== ROUTES =====
 app.use("/kashikaTravel", fetchRouter);
-app.use("/kashikaTravel/admin", packageSetRouter);
 app.use("/kashikaTravel/admin", carSetRouter);
 app.use("/kashikaTravel", authRouter);
 app.use("/kashikaTravel", packageRouter);
-app.use("/kashikaTravel", carDetailsRouter);
 
 // ===== Session (JWT) check =====
 app.get("/kashikaTravel/session-user", (req, res) => {
