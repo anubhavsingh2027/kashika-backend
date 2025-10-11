@@ -88,3 +88,25 @@ exports.bookCar = async (req, res, next) => {
     });
   }
 };
+
+//=== find user History ===
+exports.userHistory=async (req,res,next)=>{
+  try {
+    const userId = req.params.id;
+    const userData=await User.findById(userId);
+     if (!userData) {
+      return res.status(404).json({
+        message: "User not found",
+      });
+    }
+    return res.status(200).json({
+        carHistory:userData.carBooking,
+        packageHistory:userData.packageBook
+      });
+
+  } catch (error) {
+    return res.status(500).json({
+        message:"server Error"
+      });
+  }
+}

@@ -9,6 +9,10 @@ const carSchema=new mongoose.Schema({
     type:String,
     required:true
   },
+  totalSeats:{
+  type:Number,
+  required:true
+  },
   description:{
     type:String,
     required:true

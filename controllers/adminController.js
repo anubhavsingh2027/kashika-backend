@@ -9,6 +9,7 @@ exports.createPackage = async (req, res, next) => {
     const packageInfo = new packageDetailsModel({
       packageName,
       place,
+      packageDuration,
       url,
       description,
       price
@@ -43,7 +44,7 @@ exports.deletepackage =async (req,res,next)=>{
 exports.createCar = async (req, res, next) => {
   try{
 const { carName,url,description,price} = req.body;
-  const carInfo = new carDetailsModel({ carName,url,description,price });
+  const carInfo = new carDetailsModel({ carName,url,description,price,totalSeats });
   await carInfo.save();
     res.status(201).json({
       success: true,

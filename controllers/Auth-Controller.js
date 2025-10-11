@@ -54,7 +54,6 @@ exports.postSignUp = async (req, res) => {
       user: safeUser,
     });
   } catch (err) {
-    console.error("Signup error:", err);
     res.status(500).json({ status: false, message: "Server error during signup" });
   }
 };

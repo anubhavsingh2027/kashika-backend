@@ -13,6 +13,10 @@ const packageSchema=new mongoose.Schema({
     type:String,
     required:true
   },
+  packageDuration:{
+    type:Number,
+    required:true
+  },
   price:{
     type:Number,
     required:true
