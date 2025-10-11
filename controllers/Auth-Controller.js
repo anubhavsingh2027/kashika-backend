@@ -6,13 +6,13 @@ const jwt = require("jsonwebtoken");
 exports.postSignUp = async (req, res) => {
   const { userName, email, phone, location, password } = req.body;
   try {
-    // 1️⃣ Check if user already exists
+    //  Check if user already exists
     const existingUser = await User.findOne({ email: email.toLowerCase() });
     if (existingUser) {
       return res.status(400).json({ status: false, message: "User already exists" });
     }
 
-    // 2️⃣ Hash password and create new user
+    //  Hash password and create new user
     const hashedPassword = await bcrypt.hash(password, 12);
     const newUser = new User({
       userName,
@@ -23,22 +23,22 @@ exports.postSignUp = async (req, res) => {
     });
     await newUser.save();
 
-    // 3️⃣ Prepare safe user data (exclude password)
+    //  Prepare safe user data (exclude password)
     const userObj = newUser.toObject();
     const { password: _, ...safeUser } = userObj;
 
-    // 4️⃣ Create token payload
+    //  Create token payload
     const tokenPayload = {
       isLogged: true,
       user: safeUser,
     };
 
-    // 5️⃣ Sign JWT
+    //  Sign JWT
     const token = jwt.sign(tokenPayload, process.env.JWT_SECRET, {
       expiresIn: process.env.JWT_EXPIRES_IN || "1d",
     });
 
-    // 6️⃣ Store token in cookie (secure for cross-origin)
+    //  Store token in cookie (secure for cross-origin)
     res.cookie("token", token, {
       httpOnly: true,
       secure: true,
@@ -46,7 +46,7 @@ exports.postSignUp = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    // 7️⃣ Send same type of response as postLogin
+    //  Send same type of response as postLogin
     res.status(200).json({
       status: true,
       message: `Welcome to kashika Travel Mrs/Mr  ${userName}`,
@@ -63,20 +63,20 @@ exports.postLogin = async (req, res) => {
   try {
     const { email, password } = req.body;
 
-    // 1️⃣ Find user
+    //  Find user
     const user = await User.findOne({ email: email.toLowerCase() }).lean();
     if (!user)
       return res.status(422).json({ status: false, message: "User not found" });
 
-    // 2️⃣ Check password
+    //  Check password
     const isMatch = await bcrypt.compare(password, user.password);
     if (!isMatch)
       return res.status(422).json({ status: false, message: "Incorrect password" });
 
-    // 3️⃣ Remove password before encoding
+    //  Remove password before encoding
     const { password: _, ...safeUser } = user;
 
-    // 4️⃣ Create full JWT payload
+    //  Create full JWT payload
     const tokenPayload = {
       isLogged: true,
       user: safeUser, // all data here
@@ -86,7 +86,7 @@ exports.postLogin = async (req, res) => {
       expiresIn: process.env.JWT_EXPIRES_IN || "1d",
     });
 
-    // 5️⃣ Send cookie
+    //  Send cookie
     res.cookie("token", token, {
       httpOnly: true,
       secure: true, // true on HTTPS
@@ -94,7 +94,7 @@ exports.postLogin = async (req, res) => {
       maxAge: 1000 * 60 * 60 * 24,
     });
 
-    // 6️⃣ Send response
+    //  Send response
     res.status(200).json({
       status: true,
       message: `Welcome again Mrs/Mr  ${user.userName}`,
@@ -181,3 +181,4 @@ exports.updateUserType = async (req, res) => {
     res.status(500).json({ status: false, message: "Server error while changing user type" });
   }
 };
+

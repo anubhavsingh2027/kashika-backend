@@ -13,10 +13,10 @@ const mongoose = require('mongoose');
 const fetchRouter = require('./router/fetchdata');
 const packageRouter = require('./router/packageRouter');
 const carDetailsRouter = require('./router/carRouter');
-const userRouter = require('./router/AuthRouter');
+const authRouter = require('./router/AuthRouter');
 const packageSetRouter = require('./router/packageSetRouter');
 const carSetRouter = require('./router/carSetRouter');
-const errorController = require("./controllers/error");
+
 
 // ===== App & DB setup =====
 const app = express();
@@ -26,7 +26,6 @@ const port = process.env.PORT || 8000;
 // ===== Middleware =====
 app.use(bodyParser.urlencoded({ extended: true }));
 app.use(express.json());
-// cookieParser is essential for reading the token from req.cookies
 app.use(cookieParser());
 
 // ===== CORS setup (CRITICAL) =====
@@ -36,7 +35,7 @@ app.use(cors({
 }));
 
 //check unauthorized access
-app.use("/kashikaTravel/admin", async (req, res, next) => {
+app.use("/kashikaTravel/admin",async (req, res, next) => {
   try {
     const token = req.cookies.token;
 
@@ -71,13 +70,15 @@ app.use("/kashikaTravel/admin", async (req, res, next) => {
       message: "Unauthorized: Invalid or expired token",
     });
   }
-});
+}
+
+ );
 
 // ===== ROUTES =====
 app.use("/kashikaTravel", fetchRouter);
 app.use("/kashikaTravel/admin", packageSetRouter);
 app.use("/kashikaTravel/admin", carSetRouter);
-app.use("/kashikaTravel", userRouter);
+app.use("/kashikaTravel", authRouter);
 app.use("/kashikaTravel", packageRouter);
 app.use("/kashikaTravel", carDetailsRouter);
 
