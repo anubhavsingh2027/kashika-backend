@@ -32,45 +32,7 @@ app.use(cors({
   credentials: true,
 }));
 
-//check unauthorized access
-app.use("/kashikaTravel/admin",async (req, res, next) => {
-  try {
-    const token = req.cookies.token;
 
-
-    if (!token) {
-      return res.status(401).json({
-        access: false,
-        message: "Unauthorized: No token provided",
-      });
-    }
-
-    // Verify token
-    const decoded = jwt.verify(token, process.env.JWT_SECRET);
-
-    // Check user role
-    if (decoded.user.userType !== "admin") {
-      return res.status(403).json({
-        access: false,
-        message: "Forbidden: Admin access only",
-      });
-    }
-
-    // Attach user info to request (optional but useful)
-    req.user = decoded.user;
-
-    // Move to next middleware or route
-    next();
-
-  } catch (error) {
-    return res.status(401).json({
-      access: false,
-      message: "Unauthorized: Invalid or expired token",
-    });
-  }
-}
-
- );
 
 // ===== ROUTES =====
 app.use("/kashikaTravel", fetchRouter);
