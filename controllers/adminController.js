@@ -5,7 +5,7 @@ const packageDetailsModel=require('../models/packagedetailsModel');
 
 exports.createPackage = async (req, res, next) => {
   try {
-    const { packageName, place, url, description, price } = req.body;
+    const { packageName, place, url, description, price ,packageDuration} = req.body;
     const packageInfo = new packageDetailsModel({
       packageName,
       place,
@@ -43,7 +43,7 @@ exports.deletepackage =async (req,res,next)=>{
 
 exports.createCar = async (req, res, next) => {
   try{
-const { carName,url,description,price} = req.body;
+const { carName,url,description,price,totalSeats} = req.body;
   const carInfo = new carDetailsModel({ carName,url,description,price,totalSeats });
   await carInfo.save();
     res.status(201).json({
