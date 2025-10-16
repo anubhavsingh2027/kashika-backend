@@ -28,7 +28,7 @@ app.use(cookieParser());
 
 // ===== CORS setup (CRITICAL) =====
 app.use(cors({
-  origin: ["https://anubhavsingh2027.github.io","https://kashika-frontend.vercel.app/"],
+  origin: ["https://kashika-travel.anubhavsingh.website"],
   credentials: true,
 }));
 
